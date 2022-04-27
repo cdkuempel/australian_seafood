@@ -227,7 +227,6 @@ saveRDS(object = seafood_value, file = here("data", "tidy_data", "seafood_trade_
 
 Fish trade - volume by trade partner in 2019
 
-
 ```{r}
 
 seafood_trade_volume <- read_csv(here("data", "raw_data", "TRADE_PARTNERS_QUANTITY.csv")) %>% 
