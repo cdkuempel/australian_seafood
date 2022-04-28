@@ -21,13 +21,13 @@ source(here("src/directories.R"))
 
 # Codes
 
-Country UN Code
+## Country UN Code
 
 ```{r}
 un_code<-read_csv(here("data/raw_data/CL_FI_COUNTRY_GROUPS.csv")) %>% 
   dplyr::select(UN_Code, ISO3_Code, Name_En)
 ```
-Species code
+## Species code
 
 ```{r}
 species_code<-read_csv(here("data/raw_data/CL_FI_SPECIES_GROUPS.csv")) %>% 
@@ -35,7 +35,7 @@ species_code<-read_csv(here("data/raw_data/CL_FI_SPECIES_GROUPS.csv")) %>%
   rename(SPECIES.ALPHA_3_CODE = `3A_Code`,
          species_name = Name_En)
 ```
-Fishing area code
+## Fishing area code
 
 ```{r}
 area_code<-read_csv(here("data/raw_data/CL_FI_WATERAREA_GROUPS.csv")) %>% 
@@ -44,7 +44,8 @@ area_code<-read_csv(here("data/raw_data/CL_FI_WATERAREA_GROUPS.csv")) %>%
          Area_name = Name_En)
 ```
 # Data
-Capture fisheries production data
+
+## Capture fisheries production data
 
 ```{r}
 #Sort the symbols in values out
@@ -68,25 +69,7 @@ capture_prod <-
           fishing_area = fa_region_group_en,
           unit = measure,
           year = period) %>% 
-  filter(!is.na(value) == T) #%>% 
-  # mutate(year = gsub("x", "", year) %>% 
-  #          as.numeric,
-  #        flag = case_when(value == "..." ~ "No data",
-  #                         value == " " ~ "Data not separately available",
-  #                         value == "-" ~ "Nil or zero",
-  #                         value == "0 0" ~ "0<x<0.5",
-  #                         grepl(" F", value) ~ "estimate",
-  #                         TRUE ~ "Reported"), 
-   #       value = case_when(value %in% c("...", " ", "-") ~ "0",
-    #                        value == "0 0" ~ "0.25",
-     #                       grepl(" F", value) ~ gsub(" F", "", value),
-      #                      TRUE ~ value) %>% 
-       #     as.numeric)
-
-
-#sorts country coding to deal with non-UTF characters that country code depends on
-#Encoding(capture_prod$country) <- "latin1" #deals with the non-UTF
-#capture_prod$country <- iconv(capture_prod$country, "latin1", "UTF-8",sub='')
+  filter(!is.na(value) == T) 
 
 capture_prod<- capture_prod %>% 
   mutate(iso3_code = ifelse(is.na(iso3_code) == T, countrycode(capture_prod$country, origin = "country.name", destination = "iso3c", warn=TRUE), as.character(iso3_code)),
@@ -102,7 +85,7 @@ saveRDS(object = capture_prod, file = here("data", "tidy_data", "capture_product
 ```
 
 
-Aquaculture production data
+## Aquaculture production data
 
 ```{r}
 aqua_prod_raw <- 
@@ -133,7 +116,7 @@ saveRDS(object = aqua_prod_raw, file = here("data", "tidy_data", "aquaculture_pr
 
 ## REVISIT THIS NOT SURE ##
 
-Fish food balance data
+## Fish food balance data
 ```{r}
 
 fish_fbs_raw <- readRDS(here("data/raw_data/food_balance_all_data.rds")) %>% 
@@ -157,11 +140,11 @@ saveRDS(object = fish_fbs, file = here("data", "tidy_data", "fish_fbs_tidy.rds")
 ```
 
 
-Fish trade data - volume, temporal
+## Fish trade data - volume, temporal
 
 ```{r}
 comm_code<- read_csv(here("data/raw_data/CL_FI_COMMODITY_ISSCFC.csv")) %>% 
-  dplyr::select(Code, ISSCAAP, Name_En) %>% 
+  dplyr::select(Code, ISSCAAP, Name_En, HS_2017) %>% 
   rename(comm_code = Code,
          Comm_name = Name_En) #commodity code
 
@@ -197,7 +180,7 @@ saveRDS(object = seafood_trade_raw, file = here("data", "tidy_data", "seafood_tr
 ```
 
 
-Fish trade data - value, temporal
+## Fish trade data - value, temporal
 ```{r}
 
 seafood_value <- read_csv(here("data", "raw_data", "TRADE_VALUE.csv")) %>% 
@@ -225,7 +208,7 @@ saveRDS(object = seafood_value, file = here("data", "tidy_data", "seafood_trade_
 
 
 
-Fish trade - volume by trade partner in 2019
+## Fish trade - volume by trade partner in 2019
 
 ```{r}
 
@@ -260,7 +243,7 @@ test<-seafood_trade_volume%>%
 saveRDS(object = seafood_trade_volume, file = here("data", "tidy_data", "seafood_trade_volume_product_weight_by_partner_2019.rds"))
 ```
 
-CN-8 trade codes
+## CN-8 trade codes
 
 ```{r}
 
@@ -269,25 +252,12 @@ raw_codes <- read_csv(here("data", "raw_data", "conversion_factors_cn_8_2001_to_
    filter(year == 2019) %>% 
    mutate(cn_8 = gsub(" ", "", cn_8))
 
-
-
 saveRDS(object = raw_codes, here("data", "tidy_data", "cn_8_codes.rds"))
 
 ```
 
 
-
-Seafood trade data from Jessica Gephart for 2018
-```{r}
-
-read_csv(here("data", "raw_data", "model0_2018_AUS_JAG.csv")) %>% 
-   saveRDS(here("data", "tidy_data", "gephart_australian_imports.rds"))
-
-
-```
-
-
-Full food balance data - tidied to Australia only to speed up read in in other scripts
+## Full food balance data - tidied to Australia only to speed up read in in other scripts
 ```{r}
 
 fbs <-readRDS(here("data/raw_data/food_balance_all_data.rds")) %>% 
@@ -299,7 +269,15 @@ fbs_aus <- fbs %>%
 saveRDS(object = fbs_aus, file = here("data", "tidy_data", "food_balance_aus_2010-2019.rds"))
 ```
 
+## Additional data - currently unused
+Seafood trade data from Jessica Gephart for 2018
+```{r}
 
+read_csv(here("data", "raw_data", "model0_2018_AUS_JAG.csv")) %>% 
+   saveRDS(here("data", "tidy_data", "gephart_australian_imports.rds"))
+
+
+```
 World bank ESG indicators for government effectiveness - taken from World Governance indicators
 ```{r}
 
@@ -319,8 +297,6 @@ gov_eff <- wb_ESG %>%
 saveRDS(object = gov_eff, file = here("data", "tidy_data", "government_effectiveness.rds"))
 
 ```
-
-
 
 Global slavery index
 ```{r}
